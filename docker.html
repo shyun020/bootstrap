@@ -1,0 +1,849 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>Docker 이해 후 기본 명령어 익히기</title><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 3px;
+	padding: 1rem;
+}
+
+figure {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.column-list {
+	display: flex;
+	justify-content: space-between;
+}
+
+.column {
+	padding: 0 1em;
+}
+
+.column:first-child {
+	padding-left: 0;
+}
+
+.column:last-child {
+	padding-right: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding: 0.125rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+	border-collapse: collapse;
+}
+
+table {
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-block;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	transform: scale(1.5);
+	margin-right: 0.6em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1.25em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(55, 53, 47, 1);
+}
+.highlight-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.highlight-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.highlight-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.highlight-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.highlight-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.highlight-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.highlight-gray_background {
+	background: rgba(241, 241, 239, 1);
+}
+.highlight-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.highlight-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.highlight-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.highlight-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.highlight-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.highlight-purple_background {
+	background: rgba(244, 240, 247, 0.8);
+}
+.highlight-pink_background {
+	background: rgba(249, 238, 243, 0.8);
+}
+.highlight-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.block-color-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.block-color-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.block-color-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.block-color-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.block-color-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.block-color-gray_background {
+	background: rgba(241, 241, 239, 1);
+}
+.block-color-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.block-color-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.block-color-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.block-color-purple_background {
+	background: rgba(244, 240, 247, 0.8);
+}
+.block-color-pink_background {
+	background: rgba(249, 238, 243, 0.8);
+}
+.block-color-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.select-value-color-pink { background-color: rgba(245, 224, 233, 1); }
+.select-value-color-purple { background-color: rgba(232, 222, 238, 1); }
+.select-value-color-green { background-color: rgba(219, 237, 219, 1); }
+.select-value-color-gray { background-color: rgba(227, 226, 224, 1); }
+.select-value-color-opaquegray { background-color: rgba(255, 255, 255, 0.0375); }
+.select-value-color-orange { background-color: rgba(250, 222, 201, 1); }
+.select-value-color-brown { background-color: rgba(238, 224, 218, 1); }
+.select-value-color-red { background-color: rgba(255, 226, 221, 1); }
+.select-value-color-yellow { background-color: rgba(253, 236, 200, 1); }
+.select-value-color-blue { background-color: rgba(211, 229, 239, 1); }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style></head><body><article id="9eda47f3-2663-4415-ab00-0b169c054815" class="page sans"><header><h1 class="page-title">Docker 이해 후 기본 명령어 익히기</h1></header><div class="page-body"><blockquote id="59440d74-5373-4ddc-ae42-0dc67538ed1e" class=""><strong>바로가기</strong></blockquote><p id="143f0388-fb9f-4e69-bb40-45b163c0d27c" class=""><a href="Docker%20%E1%84%8B%E1%85%B5%E1%84%92%E1%85%A2%20%E1%84%92%E1%85%AE%20%E1%84%80%E1%85%B5%E1%84%87%E1%85%A9%E1%86%AB%20%E1%84%86%E1%85%A7%E1%86%BC%E1%84%85%E1%85%A7%E1%86%BC%E1%84%8B%E1%85%A5%20%E1%84%8B%E1%85%B5%E1%86%A8%E1%84%92%E1%85%B5%E1%84%80%E1%85%B5%209eda47f326634415ab000b169c054815.html">☝🏻 STEP ONE    : Docker</a></p><p id="5f2c67e7-47cd-4e6f-ba01-2d06166ad83a" class=""><a href="Docker%20%E1%84%8B%E1%85%B5%E1%84%92%E1%85%A2%20%E1%84%92%E1%85%AE%20%E1%84%80%E1%85%B5%E1%84%87%E1%85%A9%E1%86%AB%20%E1%84%86%E1%85%A7%E1%86%BC%E1%84%85%E1%85%A7%E1%86%BC%E1%84%8B%E1%85%A5%20%E1%84%8B%E1%85%B5%E1%86%A8%E1%84%92%E1%85%B5%E1%84%80%E1%85%B5%209eda47f326634415ab000b169c054815.html">✌🏻 STEP TWO   : Docker Basic Command</a></p><p id="c93e9cb7-6a94-4889-89ad-3d7aec4f9f39" class=""><a href="Docker%20%E1%84%8B%E1%85%B5%E1%84%92%E1%85%A2%20%E1%84%92%E1%85%AE%20%E1%84%80%E1%85%B5%E1%84%87%E1%85%A9%E1%86%AB%20%E1%84%86%E1%85%A7%E1%86%BC%E1%84%85%E1%85%A7%E1%86%BC%E1%84%8B%E1%85%A5%20%E1%84%8B%E1%85%B5%E1%86%A8%E1%84%92%E1%85%B5%E1%84%80%E1%85%B5%209eda47f326634415ab000b169c054815.html">🤟🏻 STEP THREE : Creating Docker Container</a></p><p id="73d0ebeb-dd5b-49a3-8e66-21c29ab855f7" class="">
+</p><h3 id="f69bb785-c855-4c94-8cf1-e3a079c6f69e" class="">☝🏻 STEP ONE : Docker</h3><p id="f12fcc07-1d9b-401b-a1d6-30e8ea4cc35e" class="">
+</p><p id="b8a9d13a-6cb9-4f2e-a621-07360fbec795" class="">도커(Docker)는 컨테이너 기술을 사용하여 애플리케이션과 그에 필요한 라이브러리, 소프트웨어 등을 하나의 패키지로 만들어 배포할 수 있도록 하는 플랫폼이에요.</p><p id="2913763e-b767-4ff3-9686-8cccbab04fe9" class="">도커를 사용하면 애플리케이션을 개발할 때 필요한 환경을 포함하여 모든 종속성을 하나의 컨테이너로 만들어 관리할 수 있어요. 이렇게 만든 컨테이너는 다른 시스템에서도 동일한 환경에서 실행될 수 있어, 개발과 배포 과정을 단순화하고 효율적으로 관리할 수 있게 돼요.</p><p id="d122ef3f-7111-4141-9301-9ab07a1dc5a0" class="">위 내용이 어려울 수 있어요. 저도 처음에 “도커의 개념을 정확하게 이해해야지!” 이런 생각으로 공부하지 않고 “도커의 느낌만 이해해보자.!” 라는 생각으로 공부했어요. 솔직히 지금도 도커를 깊게 이해하고 있지 않아요. 여러분들이 공부하면 저보다 더 잘 하실 수 있어요. 위 내용이 이해 가셨다면 바로 <a href="Docker%20%E1%84%8B%E1%85%B5%E1%84%92%E1%85%A2%20%E1%84%92%E1%85%AE%20%E1%84%80%E1%85%B5%E1%84%87%E1%85%A9%E1%86%AB%20%E1%84%86%E1%85%A7%E1%86%BC%E1%84%85%E1%85%A7%E1%86%BC%E1%84%8B%E1%85%A5%20%E1%84%8B%E1%85%B5%E1%86%A8%E1%84%92%E1%85%B5%E1%84%80%E1%85%B5%209eda47f326634415ab000b169c054815.html">STEP TWO : Docker Basic Command</a> 로 넘어가시고, 어려우시다면 제가 이해한 도커를 설명해드릴게요.</p><p id="4bb1766b-37dd-47c0-b5af-db4dcc5fd8cc" class="">도커는 <mark class="highlight-teal_background">“언제 어디서든 컨테이너 농사”</mark> 에요. 농사는 환경에 영향을 많이 받잖아요. 비도 와야 하고,
+빛도 받아야 하고, 물도 줘야 하고요. 이외에도 태풍이 오면 열심히 농사 지은 것들이 망가지지 
+않도록 신경 써야 해요. 하지만 컨테이너 농사를 하면 걱정 없어요. 컨테이너는 정말 튼튼하거든요.
+따라서 컨테이너에 농사를 짓고, 각 컨테이너 마다 날씨, 물 주는 주기, 거름 주는 주기를 설정하면
+수성, 토성, 목성, 지구 등 환경의 영향을 받지 않고 농사를 잘 지을 수 있어요.</p><p id="355857a4-35ff-4ac9-8c92-5ae0f9cf1f7a" class="">제가 컨테이너 농사를 좋아하는 가장 큰 이유는 사진을 찍어 현재를 저장할 수 있다는 거에요.
+외부의 영향을 받지 않기 때문에 외부의 영향으로 컨테이너 내부가 손상 될 수 없어요. 하지만,
+농부가 컨테이너 내부 날씨를 조절하다가 농부의 실수로 내부 농작물이 망가질 수 있어요. 이럴 때를 대비해서 농작물이 가장 잘 자랐을 때 사진을 찍어두는 거에요. 그리고 사진첩에 넣어두어야 해요. 
+사진을 잃어버릴 수 있으니까요. 만약, 농부의 실수로 농작물이 망가지면 사진첩에서 농작물이 가장 잘 자랐을 때 사진을 꺼내 마법으로 복원 하는 거에요. 그러면 농부의 실수는 없던 일이 돼요. 즉, 
+안전장치 같은 역할이에요.</p><p id="0ab272d3-9c4a-4a79-a178-c751b469d771" class="">컨테이너 농사의 장점을 정리해볼게요. </p><p id="5eb772b7-f768-40dd-b746-419492f24fba" class="">컨테이너는 외부의 영향을 받지 않아요. 따라서 블랙홀, 바다, 산, 목성 등 환경의 구애 받지 않고 농사
+할 수 있어요. 또한, 컨테이너를 만들기 전에 컨테이너 파일을 작성해서 물을 주는 주기, 날씨 등을 파일에 작성해서 생성할 수 있어요. 더불어 농부의 실수가 아니면, 외부의 영향으로 내부가 손상되지 않아요. 또한, 농사 컨테이너를 생성할 때 더불어 현재 상황을 사진으로 찍고 사진첩에 저장만 해두면 농사를 하다가 실수해도 괜찮아요. 농작물이 전부 불타버려도 괜찮아요. 사진 첩에서 불타기 이전 상태의 사진을 꺼내서 마법으로 복원할 수 있어요. 추가적으로 사진첩이 다른 사람들과 공유만 되어 있다면, 내가 올린 사진을 다른 사람이 꺼내 복원해서 사용할 수 있어요.</p><p id="537fa2da-8cff-4159-8c96-105a02f1799c" class="">이제 컨테이너 농사와 도커를 비교해볼게요. </p><ol type="1" id="6dabface-6851-4c1f-af58-8559c267c160" class="numbered-list" start="1"><li><mark class="highlight-blue"><strong>외부의 영향을 받지 않음 = container</strong></mark>
+→ 저는 ubuntu 계열 사용하고 싶어요. 하지만, 제 컴퓨터의 리눅스 계열은 CentOS 에요. 
+     이때 도커를 설치하고, ubuntu 컨테이너를 띄워서 ubuntu를 사용할 수 있어요. </li></ol><ol type="1" id="8ff7fd95-9c2c-4a11-99c6-08cc7d8ef458" class="numbered-list" start="2"><li><strong><mark class="highlight-blue">컨테이너 파일 = dockerfile</mark></strong>
+→ 도커 파일을 작성해서 이미지를 만들 수 있어요. 도커파일에 apt-get update, apt-get install  
+    apache2 등 명령어를 작성해서 이미지를 만들 수 있어요. 이후 이미지를 컨테이너로 띄우면
+    설정된 명령어를 실행한 컨테이너가 생성돼요. 간단한 도커 파일을 예시를 보여 드릴게요.</li></ol><pre id="c85c623d-0773-4093-8bdd-04a1f5519a2c" class="code"><code>FROM ubuntu:18.04                          // ubuntu:18.04 운영체제
+RUN apt-get update                         // 패키지 업데이트
+RUN apt-get install python3                // python3 패키지 다운로드
+
+## 위 처럼 도커파일을 생성하고 이미지로 만들어 컨테이너를 띄우면 ubuntu18.04, 패키지 업데이트,
+## python3가 설치가 진행 된 도커 컨테이너를 띄울 수 있어요.</code></pre><ol type="1" id="e8a01ff4-c1ac-4d25-a33c-4bd524f5e061" class="numbered-list" start="3"><li><strong><mark class="highlight-blue">컨테이너 사진 촬영 = docker commit</mark></strong>
+→ docker commit 명령어를 이용해서 현재까지 진행 된 컨테이너를 이미지로 만들 수 있어요. 
+    이미지로 만들었다면, 작업을 하다가 알 수 없는 문제가 생겨 오류를 해결할 수 없어도 괜찮아
+    요. 이전 만들어진 이미지를 컨테이너로 띄우면 오류 이전 상태로 돌아갈 수 있어요.</li></ol><ol type="1" id="16b44740-a6e9-48f2-a782-160b4b4673e8" class="numbered-list" start="4"><li><mark class="highlight-blue"><strong>사진첩 공유 = docker hub
+</strong></mark><strong>→ </strong>이미지를 <a href="https://hub.docker.com/">도커 허브</a>에 백업하여 안전하게 운영 하는거에요. 호스트에 이미지를 보관하면 실수
+    로 삭제할 수 있거나, 호스트에 문제가 생겨 이미지를 사용할 수 없을 수 있어요. 또한, 다른 
+    호스트에서는 해당 이미지를 사용할 수 없어요. 따라서 도커 허브에 이미지를 백업하는 것은 
+    안전하며, 이미지를 공유해 다른 호스트에서 사용할 수 있어요.</li></ol><p id="4e0a74f5-57cd-406f-a4a4-3b1df0177956" class="">
+</p><h3 id="3b99da23-b6a7-47b5-ba36-e5cc3915d277" class="">✌🏻 STEP TWO : Docker Basic Command</h3><p id="41d9ee87-fc26-4971-930a-9f4d52b8285f" class="">
+</p><pre id="7d3f8d06-5551-4828-af7a-e2b6d96f019a" class="code"><code>## 도커 버전 확인 ##
+root@ubuntu:/home/study# docker -v
+Docker version 20.10.21, build 20.10.21-0ubuntu1~18.04.2
+
+## 도커 파일 관련 명령어 ##
+-- 도커 파일 지시어 -- 
+지시어	      설명
+FROM         	베이스 이미지 지정
+RUN	          이미지를 지정하면서 실행할 명령 지정
+ENTRYPOINT	  컨테이너의 어플 지정 ( 컨테이너 시작할 때 실행할 명령어 )
+EXPOSE	      컨테이너의 포트 지정
+ADD	          이미지 생성 시 파일 추가
+COPY	        이미지 생성 시 파일 복사
+WORKDIR	      컨테이너 작업 디렉토리 지정
+MAINTAINER	  이미지 작성자 명시
+CMD	          컨테이너의 어플 지정 ( 컨테이너 시작할 때 실행할 명령어 )
+LABEL	        이미지의 라벨 지정
+ENV	          컨테이너의 환경 변수 지정
+VOLUME	      컨테이너의 볼륨 지정
+USER	        컨테이너의 사용자 지정
+-- 도커 파일 생성 -- 
+root@ubuntu:/home/study# docker build -t [이미지 이름] ./
+
+## 도커 이미지 관련 명령어##
+-- 저장된 도커 이미지 확인 --
+root@ubuntu:/home/study# docker images
+REPOSITORY   TAG       IMAGE ID       CREATED         SIZE
+ubuntu       18.04     50711a09dc98   7 minutes ago   109MB
+-- 도커 이미지 이름 변경 --
+root@ubuntu:/home/study# docker tag [원본 이미지 이름] [변경할 이미지 이름]
+-- 도커 이미지 삭제 -- 
+root@ubuntu:/home/study# docker rmi [이미지 이름]
+REPOSITORY   TAG       IMAGE ID       CREATED         SIZE
+-- 도커 컨테이너 이미지 저장 --
+root@ubuntu:~# docker commit [컨테이너 이름] 
+sha256:f9853646362cc3824d5038b54d39d2bf94ca3fca63ae26ebb05658fa479d9395
+root@ubuntu:~# docker images
+REPOSITORY        TAG       IMAGE ID       CREATED         SIZE
+test_commit       latest    f9853646362c   2 seconds ago   109MB
+
+## 도커 컨테이너 관련 명령어 ##
+-- 도커 컨테이너 생성 --
+도커 컨테이너 생성      : docker run [-옵션] [이미지 이름]
+도커 컨에이너 생성 옵션 : -d -&gt; 백그라운드 실행
+                         -p [포트번호] [포트번호] -&gt; (포트포워딩)
+                         --hostname [호스트네임]  -&gt; (리눅스 호스트 네임) 
+                         --name [컨테이너 이름]   -&gt; (컨테이너 이름)
+                         -it                     -&gt; (터미널)
+root@ubuntu:/home/study# docker run -d -p 80:80 -p 20:20 --hostname soohyun --name study -it ubuntu
+e070c9cd0250b0321a7d14adca497a83021261d719484143f660d8ff8c102cef
+-- 실행중인 도커 컨테이너 목록 확인 --
+root@ubuntu:/home/study# docker ps
+CONTAINER ID   IMAGE     COMMAND       CREATED          STATUS          PORTS                                                                  NAMES
+e070c9cd0250   ubuntu    &quot;/bin/bash&quot;   41 seconds ago   Up 39 seconds   0.0.0.0:20-&gt;20/tcp, :::20-&gt;20/tcp, 0.0.0.0:80-&gt;80/tcp, :::80-&gt;80/tcp   study
+-- 실행중인 도커 컨테이너 중지 --
+root@ubuntu:/home/study# docker stop [컨테이너 이름]
+study
+-- 모든 도커 컨테이너 목록 확인 --
+root@ubuntu:/home/study# docker ps -a
+CONTAINER ID   IMAGE     COMMAND       CREATED         STATUS                       PORTS     NAMES
+e070c9cd0250   ubuntu    &quot;/bin/bash&quot;   7 minutes ago   Exited (137) 3 minutes ago             study
+-- 중지 된 도커 실행 --
+root@ubuntu:/home/study# docker start [컨테이너 이름]
+study
+-- 도커 컨테이너 삭제 [실행중인 도커 컨테이너는 삭제할 수 없어요.] --
+root@ubuntu:/home/study# docker rm [컨테이너 이름]
+study
+-- 모든 도커 컨테이너 목록 확인 --
+root@ubuntu:/home/study# docker ps -a
+CONTAINER ID   IMAGE     COMMAND       CREATED          STATUS          PORTS
+-- 컨테이너 진입 --
+root@ubuntu:/home/study# docker exec -it /bin/bash [컨테이너 이름]
+-- 컨태이너 아웃 --
+root@ubuntu:/home/study# exit
+
+## 도커 허브 관련 명령어 ##
+-- 도커 허브 로그인 --
+oot@ubuntu:/home/study# docker login
+Login with your Docker ID to push and pull images from Docker Hub. If you don&#x27;t have a Docker ID, head over to https://hub.docker.com to create one.
+Username: shyun020
+Password:
+WARNING! Your password will be stored unencrypted in /root/.docker/config.json.
+Configure a credential helper to remove this warning. See
+https://docs.docker.com/engine/reference/commandline/login/#credentials-store
+Login Succeeded
+-- 도커 허브 이미지 백업 --
+-&gt; 도커 허브에 이미지를 백업하려면, 도커 이미지 이름 형식이 [도커허브ID/도커이미지 이름]
+   이여야 해요.
+root@ubuntu:~# docker push [이미지 이름]
+The push refers to repository [docker.io/shyun020/ubuntu]
+e5e4a2fbb8b0: Pushed
+683123ec38b6: Pushed
+52c5ca3e9f3b: Pushed
+18.04: digest: sha256:66ae9feb7331b9a52cf393589b77668b075c96ef26e55233ddde2c1a8dd093c6 size: 951
+-- 도커 허브 이미지 다운로드 -- 
+root@ubuntu:~# docker login
+Authenticating with existing credentials...
+WARNING! Your password will be stored unencrypted in /root/.docker/config.json.
+Configure a credential helper to remove this warning. See
+https://docs.docker.com/engine/reference/commandline/login/#credentials-store
+Login Succeeded
+root@ubuntu:~# docker images
+REPOSITORY   TAG       IMAGE ID   CREATED   SIZE
+root@ubuntu:~# docker pull shyun020/ubuntu:18.04
+18.04: Pulling from shyun020/ubuntu
+0064b1b97ec0: Pull complete
+5d66268c746c: Pull complete
+c024b19d1089: Pull complete
+Digest: sha256:66ae9feb7331b9a52cf393589b77668b075c96ef26e55233ddde2c1a8dd093c6
+Status: Downloaded newer image for shyun020/ubuntu:18.04
+root@ubuntu:~# docker images
+docker.io/shyun020/ubuntu:18.04
+REPOSITORY        TAG       IMAGE ID       CREATED        SIZE
+shyun020/ubuntu   18.04     50711a09dc98   22 hours ago   109MB</code></pre><p id="db8c9b6c-b0bc-4e9d-9b42-0b58ed9565cd" class="">
+</p><p id="795e68b9-3794-4902-b5c4-991cc649df4c" class="">🧬 <strong>도커 작업의 흐름</strong></p><p id="fbe23b6c-1c44-4b11-81ff-088abd460c23" class="">저는 도커를 사용하여 작업할 때 다음과 같이 작업해요. “이렇게 작업해야지!” 라고 생각했던 건 아니지만, 자연스럽게 아래와 같은 순으로 작업하고 있어요. 도움이 되실까.. 해서 정리해봐요.</p><p id="ce2c9e85-532e-48c9-be38-5267e3a51841" class="">
+</p><p id="2d63b552-5475-4ae2-acb2-37f7d4a15199" class="">  1.  서버 접속</p><figure id="e8c3f2c3-9d66-4afb-b441-f4d8bcdabaaa"><a href="https://quiver-kumquat-04b.notion.site/PUTTY-ca6ed29c3d654f539eb4a05c7dc8b1c4" class="bookmark source"><div class="bookmark-info"><div class="bookmark-text"><div class="bookmark-title">PUTTY</div><div class="bookmark-description">📌 PUTTY Download</div></div><div class="bookmark-href"><img src="https://www.notion.so/front-static/logo-ios.png" class="icon bookmark-icon"/>https://quiver-kumquat-04b.notion.site/PUTTY-ca6ed29c3d654f539eb4a05c7dc8b1c4</div></div><img src="Docker%20%E1%84%8B%E1%85%B5%E1%84%92%E1%85%A2%20%E1%84%92%E1%85%AE%20%E1%84%80%E1%85%B5%E1%84%87%E1%85%A9%E1%86%AB%20%E1%84%86%E1%85%A7%E1%86%BC%E1%84%85%E1%85%A7%E1%86%BC%E1%84%8B%E1%85%A5%20%E1%84%8B%E1%85%B5%E1%86%A8%E1%84%92%E1%85%B5%E1%84%80%E1%85%B5%209eda47f326634415ab000b169c054815/123.png" class="bookmark-image"/></a></figure><p id="d3459053-e130-4780-a6db-6889adc73292" class="">
+</p><ol type="1" id="04fe35f7-3b03-4151-9b1a-a26db1132615" class="numbered-list" start="2"><li>작업할 컨테이너 확인</li></ol><pre id="c96f15a0-4e52-445c-94a3-1ce9cb43bec5" class="code"><code>root@ubuntu:~# docker ps
+ONTAINER ID   IMAGE     COMMAND       CREATED          STATUS          PORTS                                                                  NAMES
+e070c9cd0250   ubuntu    &quot;/bin/bash&quot;   41 seconds ago   Up 39 seconds   0.0.0.0:20-&gt;20/tcp, :::20-&gt;20/tcp, 0.0.0.0:80-&gt;80/tcp, :::80-&gt;80/tcp   study</code></pre><p id="de283322-549a-4647-980f-e709f0ae21a7" class="">
+</p><ol type="1" id="0b2195c7-f22e-4268-b99e-58a117422105" class="numbered-list" start="3"><li>컨테이너 진입</li></ol><pre id="34c86273-24d3-4817-84b2-e15dbece1759" class="code"><code>root@ubuntu:/home/study# docker exec -it /bin/bash [컨테이너 이름]</code></pre><p id="ef6e6a20-b57b-4872-8732-5e1f8826b369" class="">
+</p><ol type="1" id="794d6588-bfc5-46a5-b7f1-8371a12aa135" class="numbered-list" start="4"><li>작업 후 컨테이너 아웃</li></ol><pre id="deb75aac-2dc4-49ed-a77b-cc33e39fed7b" class="code"><code>root@ubuntu:/home/study# exit</code></pre><p id="1808ec03-719e-4cbc-9b8f-541d5bbb6444" class="">
+</p><ol type="1" id="124bf3c1-4c03-4d72-a6cf-99c5b6b34b61" class="numbered-list" start="5"><li>컨테이너 이미지 저장</li></ol><pre id="1c7c76ce-4372-4ba2-851a-b01a650ed11d" class="code"><code>root@ubuntu:~# docker commit [컨테이너 이름] 
+sha256:f9853646362cc3824d5038b54d39d2bf94ca3fca63ae26ebb05658fa479d9395</code></pre><p id="119e4090-b6a8-4049-8005-1957687f6d85" class="">
+</p><ol type="1" id="68aea560-c1b2-4ac9-9474-9ccf81b5a816" class="numbered-list" start="6"><li>이미지 이름 변경</li></ol><pre id="784a5a63-25a1-4c9c-9e6f-495e23a61618" class="code"><code>root@ubuntu:/home/study# docker tag [원본 이미지 이름] [변경할 이미지 이름]</code></pre><p id="e1e513c1-a24d-45b7-b59d-9ec9659f5686" class="">
+</p><ol type="1" id="996adf57-c6b8-4d60-8017-ae49010bd667" class="numbered-list" start="7"><li>이미지 도커 허브 백업</li></ol><pre id="37f413b5-d102-4654-a735-83d3cafb476d" class="code"><code>root@ubuntu:~# docker push [이미지 이름]
+The push refers to repository [docker.io/shyun020/ubuntu]
+e5e4a2fbb8b0: Pushed
+683123ec38b6: Pushed
+52c5ca3e9f3b: Pushed
+18.04: digest: sha256:66ae9feb7331b9a52cf393589b77668b075c96ef26e55233ddde2c1a8dd093c6 size: 951</code></pre><p id="203d9ca8-bf7b-48e7-b96b-10dcdc139dbf" class="">
+</p><h3 id="dcc5178a-9b7c-4099-92e4-b04afe5f8142" class="">🤟🏻 STEP THREE : Creating Docker Container</h3><p id="a84aec08-4957-4669-9cca-53f55b0c2ddc" class="">
+</p><pre id="699f5ba9-4076-411a-956b-cef52fbd091a" class="code"><code>## 도커 패키지 설치 ##
+root@ubuntu:~# apt-get update
+root@ubuntu:~# apt-get install docker
+root@ubuntu:~# apt-get install docker.io -y
+
+## 도커 파일 생성 ##
+root@ubuntu:/home/study# vi ./Dockerfile
+1. FROM ubuntu:18.04
+2. RUN apt-get update
+:wq
+
+## 도커 파일 이미지 빌드 ##
+root@ubuntu:/home/study# docker build -t [이미지 이름] ./
+
+## 도커 컨테이너 생성 ##
+root@ubuntu:/home/study# docker run -d -p 80:80 -p 20:20 --hostname soohyun --name study -it ubuntu
+
+## 실행중인 컨테이너 목록 확인 ##
+root@ubuntu:~# docker ps
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES</code></pre></div></article></body></html>
